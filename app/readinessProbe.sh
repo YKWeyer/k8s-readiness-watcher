@@ -1,8 +1,8 @@
 #!/bin/sh
 
-namespace=${NAMESPACE:-default}
-service=${SERVICE}
-refresh=${REFRESH:-15}
+service=${1:-$SERVICE}
+namespace=${2:-${NAMESPACE:-default}}
+refresh=${3:-${REFRESH:-15}}
 url=${MASTER_URL:-"https://kubernetes.default.svc"}
 
 cacert=${SA_CACERT:-"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}

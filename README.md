@@ -36,6 +36,10 @@ spec:
           value: kube-public
         - name: SERVICE
           value: my-service
+      # or with short syntax:
+      - name: waitfor-otherservice
+        image: ykweyer/k8s-readiness-watcher
+        args: [ "my-service", "kube-public", "30" ]
 ```
 
 You can add as many initContainers as you want, depending on how many services are required. The targeted pods 
