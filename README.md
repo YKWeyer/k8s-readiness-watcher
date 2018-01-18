@@ -1,7 +1,7 @@
 # Kubernetes readiness watcher
 
-**Kubernetes readiness watcher** creates a docker container whose only job is to request the status of one specified 
-service using the Kubernetes API, and success when the endpoint is ready.
+**Kubernetes readiness watcher** is a docker container whose only job is to request the status of a service 
+using the Kubernetes API, and success when the endpoint is ready.
 It is meant to be used as an initContainer, preventing the pod to launch further containers until the required services
 are ready to be consumed.
 
@@ -12,9 +12,10 @@ Some Services are so dependant on another one that trying to launch them before 
 possible.
 
 Using [the busybox example](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#init-containers-in-use) 
-from the documentations allows to check the required Service exists, but there is no simple solution for it yet.
+from the documentations allows to check the required Service exists, but there is no simple solution for testing readiness 
+(as defined in a Pods `readinessProbe` property) yet.
 
-This alpine-based Docker image fulfills only one purpose: it blocks the initialization of the container until the 
+This alpine-based Docker image fulfills only one purpose: it pauses the initialization of main containers until the 
 required services are ready.
 
 
@@ -40,6 +41,13 @@ spec:
       - name: waitfor-otherservice
         image: ykweyer/k8s-readiness-watcher
         args: [ "my-service", "kube-public", "30" ]
+      # you can even combine both (args has prevalence):
+      - name: waitfor-lastservice
+        image: ykweyer/k8s-readiness-watcher
+        args: [ "my-service" ]
+        envFrom:
+        - configMapRef:
+            name: readiness-watcher-config
 ```
 
 You can add as many initContainers as you want, depending on how many services are required. The targeted pods 
@@ -48,6 +56,22 @@ be defined.
 
 
 ### Available parameters
+
+#### Short syntax
+The shell script accepts following arguments (the order matters)
+```bash
+$ k8s-readinessProbe service-name [namespace-name [refresh-interval]]
+
+# test for the existence of redis in "custom" every 5 seconds:
+$ k8s-readinessProbe redis custom 5
+
+# test for the existence of a mysql service in default namespace every 15 seconds (default value):
+$ k8s-readinessProbe mysql
+```
+
+#### Environment variables
+Env variable are used as fallback if no `args` are defined. You can combine both in your yaml, which allows you to define
+values likely similar across several pods (like `MASTER_URL`, or `SA_CACERT`) in a shared `ConfigMap`
 
 | Parameter     | Default value                                          |
 | ------------- | ------------------------------------------------------ |
@@ -61,3 +85,4 @@ be defined.
 
 ## Inspired by
 - Giantswarms [Blog article](https://blog.giantswarm.io/wait-for-it-using-readiness-probes-for-service-dependencies-in-kubernetes/)
+- [Official Init Containers documentation](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#what-can-init-containers-be-used-for)
