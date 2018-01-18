@@ -1,22 +1,20 @@
 # Kubernetes readiness watcher
 
 **Kubernetes readiness watcher** is a docker container whose only job is to request the status of a service 
-using the Kubernetes API, and success when the endpoint is ready.
+using the Kubernetes API, and succeed when the endpoint is ready.
 It is meant to be used as an initContainer, preventing the pod to launch further containers until the required services
 are ready to be consumed.
 
 
 ## Purpose
 
-Some Services are so dependant on another one that trying to launch them before their dependancies is ready isn't even 
-possible.
+This alpine-based Docker image fulfills only one purpose: it pauses the initialization of main containers until the 
+required services are ready.
 
 Using [the busybox example](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#init-containers-in-use) 
 from the documentations allows to check the required Service exists, but there is no simple solution for testing readiness 
 (as defined in a Pods `readinessProbe` property) yet.
 
-This alpine-based Docker image fulfills only one purpose: it pauses the initialization of main containers until the 
-required services are ready.
 
 
 ## Usage
