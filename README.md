@@ -9,13 +9,13 @@ are ready to be consumed.
 ## Purpose
 
 This alpine-based Docker image fulfills only one purpose: it pauses the initialization of main containers until the 
-required services are ready.
+required services are ready (as defined in a Pods `readinessProbe` property).
 
-Using [the busybox example](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#init-containers-in-use) 
-from the documentations allows to check the required Service exists, but there is no simple solution for testing readiness 
-(as defined in a Pods `readinessProbe` property) yet.
+### Alternative approaches
 
-
+- Testing nslookup (see [the busybox example](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#init-containers-in-use)) checks service existence, not readiness
+- Using kubectl cli (as [k8s-wait-for](https://github.com/groundnuty/k8s-wait-for) does) makes the image heavier and adds complexity
+- Simply pinging a service name return false negatices (*TODO: understand why*) 
 
 ## Usage
 
